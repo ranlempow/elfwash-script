@@ -37,9 +37,11 @@ jspm_packages
 bower_components
 
 # tools
-bin
+bin/node
 luajs.zip
 
 # output files
 dist
 
+# remote ssh password
+secret.json

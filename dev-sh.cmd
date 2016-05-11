@@ -1,0 +1,1 @@
+call %~dp0one\bin\dev-sh.cmd
