@@ -1,0 +1,17 @@
+#!/bin/bash
+
+dp0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${dp0}/base.sh
+
+export TITLE=${PROJECT_BASE##*/}
+export PATH=${ONE_BASE}/bin:${PATH}
+
+source ${ONE_BASE}/set-env.sh
+export PS1='\[\e]2;[${TITLE}]\a\](${TITLE}) \W $ '
+
+if [ -z "$1" ]; then
+  cat ${ONE_BASE}/help.txt
+  /bin/bash
+else
+  /bin/bash -c "$1"
+fi

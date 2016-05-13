@@ -19,13 +19,16 @@ module.exports = function(grunt) {
       }
     },
     watch: {
-      files: ['src/main.lua', 'src/run.tpl.html'],
+      files: ['src/**'],
       tasks: ['template']
     },
     copy: {
       main: {
         files: [
-          {expand: true, src: ['bower_components/*/*.js', 'bower_components/*/dist/*.js'], dest: 'dist/'},
+          {expand: true, src: ['bower_components/*/*.js', 'bower_components/*/*.css',
+                               'bower_components/*/dist/*.js', 'bower_components/*/dist/*.css', 'bower_components/*/dist/css/*.css'],
+            dest: 'dist/'
+          },
           {expand: true, src: ['thirdparty/lua.js', 'src/main.js'], dest: 'dist/'},
         ],
       },
@@ -138,8 +141,8 @@ module.exports = function(grunt) {
     ghpages.publish(path.join(__dirname, 'dist'), done);
   });
 
-  grunt.registerTask('upload', ['build', 'upload-github']);
-  grunt.registerTask('deploy', ['build', 'ssh_deploy:production']);
+  grunt.registerTask('deploy-github', ['build', 'upload-github']);
+  grunt.registerTask('deploy-gamelab', ['build', 'ssh_deploy:production']);
   grunt.registerTask('default', ['build']);
 
 };

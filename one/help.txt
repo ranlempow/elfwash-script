@@ -1,15 +1,16 @@
 # This is node.js project
-  [dev init] - after clone from remote, use [dev init] to create environment
+  [dev init] - after clone from git remote, use [dev init] to create environ
   [dev help] - show this help massage
   
   [grunt watch] - reflect change for source edit
   [grunt build] - manually bulid source to dist/*
-  [grunt deploy] - deploy this project to shaji.gamelab.tw server
+  [grunt deploy-github] - deploy this project to github page
+  [grunt deploy-gamelab] - deploy this project to shaji.gamelab.tw server
   [grunt bumplog[:patch/:minor/:major]] - prepare new version for commit, rolling changelog
   
   [git add/commit/push/fetch] - git operation is free to use
 
-  the routine of develop process is 
+# the routine of develop process is 
     -> [git poll] -> [grunt watch] -> coding/test -> [grunt bumplog] 
-    -> [git add/commit/push] -> [grunt deploy]
+    -> [git add/commit/push] -> [grunt deploy-github]
 
