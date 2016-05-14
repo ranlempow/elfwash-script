@@ -2,7 +2,7 @@
 
 dp0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${dp0}/bin/base.sh
-source ${dp0}/set-env.sh
+source ${ONE_BASE}/set-env.sh
 
 rm -rf ${PROJECT_BASE}/bin/node
 rm -rf ${PROJECT_BASE}/bower_components
