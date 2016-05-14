@@ -1,8 +1,17 @@
 module.exports = function(grunt) {
     
+  var ssh_secret = null;
+  try {
+    ssh_secret = grunt.file.readJSON('secret.json')
+  } catch (e) {
+    ssh_secret = grunt.file.readJSON('secret.template.json')
+  }
+
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    
+    // configure of build processing
     template: {
       options: {
         // Task-specific options go here
@@ -33,12 +42,14 @@ module.exports = function(grunt) {
         ],
       },
     },
-    secret: grunt.file.readJSON('secret.json'),
+    
+    // configure of grunt-ssh-deploy
+    secret: ssh_secret,
     environments: {
       options: {
         local_path: 'dist',
         current_symlink: 'current',
-        deploy_path: '/home/ran-http/domain/gamelab/elfwash-script'
+        deploy_path: '<%= secret.production.deploy_path %>'
       },
       production: {
         options: {
@@ -51,13 +62,14 @@ module.exports = function(grunt) {
       },
     },
       
+    // configure of grunt-bump
     bump: {
       options: {
         files: ['package.json'],
         updateConfigs: ['pkg'],
         commit: true,
         commitMessage: 'Release v%VERSION%',
-        commitFiles: ['package.json', 'CHANGELOG'],
+        commitFiles: ['package.json', 'CHANGELOG.md'],
         createTag: false,
         tagName: 'v%VERSION%',
         tagMessage: 'Version %VERSION%',
@@ -103,7 +115,7 @@ module.exports = function(grunt) {
     var bumpdate = getFormattedDate(new Date());
 
     
-    var data = fs.readFileSync('./CHANGELOG', {encoding: 'utf-8'});
+    var data = fs.readFileSync('./CHANGELOG.md', {encoding: 'utf-8'});
     var arrayOfLines = data.match(/[^\r\n]*(\r\n|\r|\n)/g);
     arrayOfLines = arrayOfLines.map( function(line) {
       return line.trim();
@@ -118,8 +130,8 @@ module.exports = function(grunt) {
     arrayOfLines[unreleased_idx] = changelog_title
     arrayOfLines.splice(unreleased_idx, 0, unreleased_title, '', '');
     
-    fs.writeFileSync('./CHANGELOG', arrayOfLines.join('\r\n'), {encoding: 'utf-8'});
-    grunt.log.ok('changelog: update CHANGELOG');
+    fs.writeFileSync('./CHANGELOG.md', arrayOfLines.join('\r\n'), {encoding: 'utf-8'});
+    grunt.log.ok('changelog: update CHANGELOG.md');
     grunt.log.ok('changelog: replace "' + unreleased_title + '" with "' + changelog_title + '"');
   });
   
