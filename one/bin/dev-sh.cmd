@@ -27,11 +27,11 @@
 
 :Excute
 @set CMDSCRIPT=!CMDSCRIPT! %1^&
-start "[%TITLE%]" ansicon.exe cmd.exe /U /C "%CMDSCRIPT%"
+start "[%TITLE%]" ansicon.exe cmd.exe /C "%CMDSCRIPT%"
 @goto quit
 
 :StartShell
-start "[%TITLE%]" ansicon.exe cmd.exe /U /K "%CMDSCRIPT%"
+start "[%TITLE%]" ansicon.exe cmd.exe /K "%CMDSCRIPT%"
 @goto quit
 
 :IfError
