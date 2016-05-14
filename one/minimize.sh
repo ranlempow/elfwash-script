@@ -1,10 +1,10 @@
-setlocal
-call %~dp0bin\base.cmd
-call %~dp0set-env.cmd
+#!/bin/bash
 
-rd /Q /S %PROJECT_BASE%\bin\node
-rd /Q /S %PROJECT_BASE%\bower_components
-rd /Q /S %PROJECT_BASE%\dist
-rd /Q /S %PROJECT_BASE%\node_modules
+dp0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${dp0}/bin/base.sh
+source ${dp0}/set-env.sh
 
-endlocal
+rm -rf ${PROJECT_BASE}/bin/node
+rm -rf ${PROJECT_BASE}/bower_components
+rm -rf ${PROJECT_BASE}/node_modules
+rm -rf ${PROJECT_BASE}/dist

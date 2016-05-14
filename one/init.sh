@@ -1,21 +1,17 @@
-setlocal
-call %~dp0bin\base.cmd
-call %~dp0set-env.cmd
+#!/bin/bash
 
-set BINDIR=%PROJECT_BASE%\bin
+dp0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${dp0}/bin/base.sh
+source ${dp0}/set-env.sh
 
-if exist %BINDIR%\node goto InstallNodeNodule
-set /P NodeZipPath=where is node-5.7.1-standalone.zip?
-mkdir %BINDIR%
-"C:\Program Files\7-Zip\7z.exe" x %NodeZipPath% -o%BINDIR%
+BINDIR=${PROJECT_BASE}/bin
 
-:InstallNodeNodule
-setlocal
-  call npm install
-endlocal
+if [ ! -f ${BINDIR}\node ]; then
+    NODEURL=https://nodejs.org/dist/v4.4.4/node-v4.4.4-linux-x64.tar.xz
+    curl -O ${NODEURL}
+    tar -xvfJp ${NODEURL##*/} -C ${PROJECT_BASE}/bin
+    mv ${PROJECT_BASE}/bin/${NODEURL%.tar.xz} ${PROJECT_BASE}/bin/node
+fi
 
-setlocal
-  call bower install
-endlocal
-
-endlocal
+npm install
+bower install

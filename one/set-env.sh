@@ -1,3 +1,5 @@
+#!/bin/bash
+
 dp0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${dp0}/bin/base.sh
 
