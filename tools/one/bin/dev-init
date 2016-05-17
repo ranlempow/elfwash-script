@@ -2,4 +2,5 @@
 
 dp0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source ${dp0}/base.sh
-source ${ONE_BASE}/minimize.sh
+source ${ONE_CONFIG_BASE}/init.sh
+

@@ -16,8 +16,13 @@
 @set ONE_BASE=%cd%
 @popd
 
-@pushd %~dp0..\..
+@pushd %~dp0..\..\..
 @set PROJECT_BASE=%cd%
+@pushd config\one
+@set ONE_CONFIG_BASE=%cd%
 @popd
+@popd
+
+
 
 :IF_ERROR

@@ -1,6 +1,6 @@
 setlocal
-call %~dp0bin\base.cmd
-call %~dp0set-env.cmd
+@rem call %~dp0bin\base.cmd
+@rem call %~dp0set-env.cmd
 
 set BINDIR=%PROJECT_BASE%\bin
 

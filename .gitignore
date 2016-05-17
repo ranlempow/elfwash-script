@@ -37,7 +37,7 @@ jspm_packages
 bower_components
 
 # tools
-bin/node
+bin/apps
 luajs.zip
 
 # output files

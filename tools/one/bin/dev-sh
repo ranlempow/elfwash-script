@@ -6,12 +6,18 @@ source ${dp0}/base.sh
 export TITLE=${PROJECT_BASE##*/}
 export PATH=${ONE_BASE}/bin:${PATH}
 
-source ${ONE_BASE}/set-env.sh
+source ${ONE_BASE}/bin/set-env
 export PS1='\[\e]2;[${TITLE}]\a\](${TITLE}) \W $ '
 
 if [ -z "$1" ]; then
-  cat ${ONE_BASE}/help.txt
+  cat ${ONE_CONFIG_BASE}/help.txt
+  CURRENT_DIR="$(pwd)"
+  cd ${PROJECT_BASE}
   /bin/bash
+  cd ${CURRENT_DIR}
 else
+  CURRENT_DIR="$(pwd)"
+  cd ${PROJECT_BASE}
   /bin/bash -c "$1"
+  cd ${CURRENT_DIR}
 fi

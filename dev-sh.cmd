@@ -1,1 +1,1 @@
-call %~dp0one\bin\dev-sh.cmd
+call %~dp0tools\one\bin\dev-sh.cmd

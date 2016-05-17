@@ -1,6 +1,6 @@
 setlocal
-call %~dp0bin\base.cmd
-call %~dp0set-env.cmd
+@rem call %~dp0bin\base.cmd
+@rem call %~dp0set-env.cmd
 
 rd /Q /S %PROJECT_BASE%\bin\node
 rd /Q /S %PROJECT_BASE%\bower_components

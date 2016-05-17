@@ -3,7 +3,8 @@
 dp0="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ONE_BASE="$( cd "${dp0}/.." && pwd )"
-PROJECT_BASE="$( cd "${dp0}/../.." && pwd )"
+PROJECT_BASE="$( cd "${dp0}/../../.." && pwd )"
+ONE_CONFIG_BASE="$( cd "${dp0}/../../../config/one" && pwd )"
 
 if [ "$(uname)" == "Darwin" ]; then 
     PLATFROM="OSX"

@@ -15,23 +15,27 @@
 @set PATH=%ONE_BASE%\bin;%PATH%
 @set PATH=%PROJECT_BASE%\bin\ansi\x64;%PATH%
 @set PROMPT=$C!TITLE!$F$S$P$G
-@call %ONE_BASE%\set-env.cmd
+@call %ONE_BASE%\bin\set-env.cmd
 
 
 @set CMDSCRIPT=
 @rem set CMDSCRIPT=!CMDSCRIPT! set PROMPT=$C!TITLE!$F$S$P$G^&
-@set CMDSCRIPT=!CMDSCRIPT! type %ONE_BASE%\help.txt^&
+@set CMDSCRIPT=!CMDSCRIPT! type %ONE_CONFIG_BASE%\help.txt^&
 
 @if not [%ONE_ERROR%] EQU [] goto IfError
 @if [%1] EQU [] goto StartShell
 
 :Excute
 @set CMDSCRIPT=!CMDSCRIPT! %1^&
-start "[%TITLE%]" ansicon.exe cmd.exe /C "%CMDSCRIPT%"
+@pushd %PROJECT_BASE%
+@start "[%TITLE%]" ansicon.exe cmd.exe /C "%CMDSCRIPT%"
+@popd
 @goto quit
 
 :StartShell
-start "[%TITLE%]" ansicon.exe cmd.exe /K "%CMDSCRIPT%"
+@pushd %PROJECT_BASE%
+@start "[%TITLE%]" ansicon.exe cmd.exe /K "%CMDSCRIPT%"
+@popd
 @goto quit
 
 :IfError
