@@ -45,3 +45,8 @@ dist
 
 # remote ssh password
 secret.json
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+sublt.cmd

@@ -1,2 +1,1 @@
-@rem @set PATH=%PROJECT_BASE%\bin\node;%PATH%
-@rem @set PATH=%PROJECT_BASE%\node_modules\.bin;%PATH%
+@set PATH=%LOCALAPPDATA%\Programs\Sublime Text Build 3083 x64;%PATH%

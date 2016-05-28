@@ -17,6 +17,7 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-ssh-deploy": "^0.4.1",
-    "grunt-template": "^0.2.3"
+    "grunt-template": "^0.2.3",
+    "lodash": "^4.13.1"
   }
 }

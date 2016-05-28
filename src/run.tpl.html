@@ -17,11 +17,12 @@
             background: #666;
             overflow-y: scroll;
         }
-        .container{
+        .obj-container{
             float: left;
             width: 160px;
+            padding: 5px;
         }
-        .container > button{
+        .obj-container > button {
             background-color: #ffffff;
             border-style: solid;
             border-width: 1px 1px 0px 1px;
@@ -29,38 +30,32 @@
             display: block;
             width: 100%;
         }
-        .container > ul{
+        .obj-container > ul {
             padding: 0px;
             margin: 0px;
             border-style: solid;
             border-width: 1px;
             border-color: #808080;
         }
+        .obj-container > .title {
+            font-weight: bold;
+            text-align: center;
+        }
         .member{
             list-style-type: none;
+            cursor: pointer;
         }
         .select{
-            color: #ff0;
+            color: #f88;
         }
     </style>
 </head>
 <body>
-    <!--
-    <div>
-        <li><a id="run">Compile&Run</a></li>
-        <li><a id="add-friend">Compile</a></li>
-    </div>
-    <div style="float:right;color:white;">Lua.js Live demo</div>
-    
-    <div id="output">
-        <div>haha</div>
-        <div>haha</div>
-    </div>
-    -->
+
     <div class="example"></div>
     
     <script type="application/x-lua" id="lua-main">
-        <%- mainlua %>
+        <%= mainlua %>
     </script>
     
     <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -77,7 +72,7 @@
     <script src="bower_components/sensei-grid/dist/sensei-grid.js"></script>
     
     
-    <script src="src/main.js"></script>
+    <script src="js/main.js"></script>
     
 </body>
 </html>

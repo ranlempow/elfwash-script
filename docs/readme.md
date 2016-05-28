@@ -1,3 +1,3 @@
 
 
-[TestLink](design.md)
+[GameModel](design.md)

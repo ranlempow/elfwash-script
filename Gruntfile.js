@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-    
+  var _ = require('lodash');
   var ssh_secret = null;
   try {
     ssh_secret = grunt.file.readJSON('secret.json')
@@ -12,33 +12,38 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     
     // configure of build processing
-    template: {
+    'template': {
       options: {
         // Task-specific options go here
       },
       build: {
         options: {
-          data: {
-            'mainlua': grunt.file.read('src/main.lua'),
+          data: function() {
+            return {
+              'mainlua': grunt.file.read('src/js/main.lua'),
+              'changelog': grunt.file.read('CHANGELOG.md'),
+            }
           }
         },
         files: {
-          'dist/run.html': ['src/run.tpl.html']
+          'dist/run.html': ['src/run.tpl.html'],
+          'dist/index.html': ['src/index.tpl.html'],
         }
       }
     },
     watch: {
       files: ['src/**'],
-      tasks: ['template']
+      tasks: ['template', 'copy']
     },
     copy: {
       main: {
         files: [
           {expand: true, src: ['bower_components/*/*.js', 'bower_components/*/*.css',
-                               'bower_components/*/dist/*.js', 'bower_components/*/dist/*.css', 'bower_components/*/dist/css/*.css'],
+                               'bower_components/*/dist/**/*.js', 'bower_components/*/dist/**/*.css', ], //, 'bower_components/*/dist/css/*.css'],
             dest: 'dist/'
           },
-          {expand: true, src: ['thirdparty/lua.js', 'src/main.js'], dest: 'dist/'},
+          {expand: true, src: ['thirdparty/lua.js'], dest: 'dist/'},
+          {expand: true, cwd:"src/", src: ['js/*.js', '*.html', '!*.tpl.html'], dest: 'dist/'},
         ],
       },
     },
@@ -91,7 +96,56 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ssh-deploy');
   grunt.loadNpmTasks('grunt-bump');
   
-  grunt.registerTask('build', ['template', 'copy']);
+
+  grunt.registerMultiTask('template-no-escape', 'Interpolate template files with any data you provide', function() {
+    // Merge task-specific and/or target-specific options with these defaults:
+    var options = this.options({
+      'data': {},
+    });
+
+    // Iterate over all specified file groups.
+    this.files.forEach(function(file) {
+      // Concat specified files.
+      var src = file.src.filter(function(filePath) {
+        // Warn on and remove invalid source files.
+        if (!grunt.file.exists(filePath)) {
+          grunt.log.warn('Source file `' + filePath + '` not found.');
+          return false;
+        } else {
+          return true;
+        }
+      });
+      if (!src.length) {
+        grunt.log.warn(
+          'Destination `' + file.dest +
+          '` not written because `src` files were empty.'
+        );
+        return;
+      }
+      var template = src.map(function(filePath) {
+        // Read file source.
+        return grunt.file.read(filePath);
+      }).join('\n');
+
+      var data =  typeof options.data == 'function' ?
+        options.data() :
+        options.data
+      
+      var compiled = _.template(template, {escape:''});
+
+      var result = compiled(data); 
+      grunt.log.writeln(data.mainlua)
+      //var result = grunt.template.process(template, templateOptions);
+
+      // Write the destination file
+      grunt.file.write(file.dest, result);
+
+      // Print a success message
+      grunt.log.writeln('File `' + file.dest + '` created.');
+    });
+  });
+
+
   
   grunt.registerTask('changelog', 'update changelog (most combine with bump, and after bump).', function() {
     var fs = require('fs');
@@ -152,6 +206,9 @@ module.exports = function(grunt) {
     var done = this.async();
     ghpages.publish(path.join(__dirname, 'dist'), done);
   });
+
+
+  grunt.registerTask('build', ['template', 'copy']);
 
   grunt.registerTask('deploy-github', ['build', 'upload-github']);
   grunt.registerTask('deploy-gamelab', ['build', 'ssh_deploy:production']);

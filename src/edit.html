@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lua.js live demo</title>
+  
+  <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.css"/>
+  <link rel="stylesheet" type="text/css" href="bower_components/sensei-grid/dist/sensei-grid.css"/>
+  <style type="text/css" media="screen">
+      body,div,p,pre{
+        margin:0;
+        padding:0
+      }
+      body,html {width: 100%; height: 100%; overflow: hidden;}
+      
+      .btn {
+        font-size: 16px;
+      }
+      
+      .sen-grid {
+        overflow: scroll;
+      }
+      
+      #table-list > * > .list-group-item {
+        padding-top: 4px;
+        padding-bottom: 4px;
+      }
+      
+      #main-menu {
+        padding: 10px;
+      }
+  </style>
+</head>
+<body>
+  <div id="main-menu" class="btn-group" role="group" aria-label="...">
+    <button type="button" class="btn btn-default">欄位說明</button>
+    <button type="button" class="btn btn-default">下載</button>
+    <button type="button" class="btn btn-default">存檔</button>
+    <button type="button" class="btn btn-default">刪除</button>
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      讀檔 <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#">Action</a></li>
+      <li><a href="#">Another action</a></li>
+      <li><a href="#">Something else here</a></li>
+      <li><a href="#">Separated link</a></li>
+    </ul>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-2">
+      <div id="table-list">
+        <div class="list-group">
+          <a href="#" class="list-group-item">abc</a>
+          <a href="#" class="list-group-item">Morbi leo risus</a>
+          <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+          <a href="#" class="list-group-item">Vestibulum at eros</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="level1 help-text"></div>
+      <div class="level1 sen-grid">level1-grid</div>
+      <div class="level2 help-text"></div>
+      <div class="level2 sen-grid">level2-grid</div>
+      <div class="level3 help-text"></div>
+      <div class="level3 sen-grid">level3-grid</div>
+    </div>
+  </div>
+    
+    
+
+  <!--
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/underscore/underscore.js"></script>
+  <script src="bower_components/backbone/backbone.js"></script>
+  <script src="thirdparty/lua.js"></script>
+  -->
+  
+  <!-- sensei-grid and their dependcies -->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/lodash/lodash.min.js"></script>
+  <script src="bower_components/sensei-grid/dist/sensei-grid.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+  
+  <script src="js/edit.js"></script>
+  
+</body>
+</html>

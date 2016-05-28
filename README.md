@@ -1,7 +1,6 @@
 
 ### 開發方式
 
-目前只支援windows環境開發.
 打開專案目錄中的 dev-sh.cmd 腳本檔, 來進入開發環境.
 
 首次使用前先執行初始化安裝.
@@ -11,7 +10,7 @@ dev init
 這將會安裝node.js在專案資料夾中, 並且安裝npm以及bower的package.
 
 
-撰寫更新日誌
+可以參考網路上的提議標準來撰寫更新日誌
 http://keepachangelog.com/zh-TW/
 
 
