@@ -1,5 +1,4 @@
 @setlocal EnableDelayedExpansion
-@setlocal
 
 @call %~dp0base.cmd
 
@@ -21,6 +20,7 @@
 @set CMDSCRIPT=
 @rem set CMDSCRIPT=!CMDSCRIPT! set PROMPT=$C!TITLE!$F$S$P$G^&
 @set CMDSCRIPT=!CMDSCRIPT! type %ONE_CONFIG_BASE%\help.txt^&
+
 
 @if not [%ONE_ERROR%] EQU [] goto IfError
 @if [%1] EQU [] goto StartShell

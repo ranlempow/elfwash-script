@@ -1,0 +1,1 @@
+bin\apps\mariadb-10.1.14-winx64\bin\mysqld --datadir "%PROJECT_BASE%\mysql-data"
