@@ -1,0 +1,128 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Condensed:400,700);
+.mixin-user-defined-constant {
+  color: #C5656B;
+  font-weight: bold;
+}
+body {
+  background: #1b1512;
+  color: #BDAE9D;
+  border-color: #BDAE9D;
+  font-family: lato, "Roboto Condensed";
+}
+button {
+  background: #2a211c;
+  border: 1px solid;
+  padding: 1px 16px;
+  display: block;
+}
+.jspDrag {
+  background: #675145;
+}
+.jspTrack {
+  background: #392d26;
+}
+#workspace {
+  margin: 1px;
+  display: flex;
+  flex-flow: row wrap;
+  height: 75vh;
+  overflow-y: scroll;
+}
+#workspace .obj-container {
+  flex: 0 1 auto;
+}
+#workspace .breaker {
+  flex: 0 1 100%;
+}
+.obj-container {
+  width: 210px;
+  padding: 0px;
+  border: 5px solid #1b1512;
+}
+.obj-container:focus {
+  border: 5px solid #2a211c;
+  outline: none;
+}
+.obj-container .title {
+  font-weight: bold;
+}
+.obj-container .button-group {
+  display: flex;
+  flex-wrap: wrap;
+}
+.obj-container .button-group button {
+  border-radius: 3px;
+  flex: 1 1 auto;
+  font-size: 16px;
+}
+.obj-container .button-group button:hover {
+  background: #000;
+}
+.obj-container .button-group button:active {
+  background: #fff;
+}
+.obj-container .button-group button.active {
+  background: #fff;
+}
+.obj-container > ul {
+  padding: 0px;
+  margin: 0px;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 3px;
+}
+.obj-container > ul img {
+  height: 32px;
+  width: 32px;
+}
+.obj-container > ul .title {
+  font-weight: bold;
+  text-align: center;
+}
+.obj-container > ul .member {
+  list-style-type: none;
+  cursor: pointer;
+}
+.obj-container > ul .member.select {
+  color: #C5656B;
+  font-weight: bold;
+}
+.obj-container > ul .member.last-select {
+  color: #C5656B;
+  font-weight: bold;
+  color: #e1afb2;
+}
+.json-view pre {
+  padding: 0px;
+  line-height: 1.0;
+  background: #2A211C;
+  color: #BDAE9D;
+}
+.json-view pre::selection {
+  background: #3A312C;
+}
+.json-view pre span::selection {
+  background: #3A312C;
+}
+.json-view pre .string {
+  color: #44AA43;
+}
+.json-view pre .number {
+  color: #44EA43;
+}
+.json-view pre .quota {
+  color: #44CA43;
+}
+.json-view pre .changed {
+  color: #C5656B;
+}
+.json-view pre .importants {
+  font-weight: bold;
+}
+.event-view pre {
+  height: 100%;
+  padding-left: 15px;
+}
+.event-view pre .record:nth-child(n+2):before {
+  content: '\a';
+}

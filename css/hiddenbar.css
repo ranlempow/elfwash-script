@@ -1,0 +1,30 @@
+.hidden-bar.hidden-left {
+  position: absolute;
+  top: 0px;
+  z-index: 1000;
+  left: 0px;
+}
+.hidden-bar.hidden-right {
+  position: absolute;
+  top: 0px;
+  z-index: 1000;
+  right: 0px;
+}
+.hidden-bar.hidden-left .toggler {
+  float: left;
+  padding-left: 5px;
+  padding-right: 5px;
+  display: block;
+}
+.hidden-bar.hidden-right .toggler {
+  float: right;
+  padding-left: 5px;
+  padding-right: 5px;
+  display: block;
+}
+.hidden-bar > button {
+  display: none;
+}
+.hidden-bar.toggled > button {
+  display: block;
+}

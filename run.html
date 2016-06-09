@@ -4,86 +4,145 @@
     <meta charset="UTF-8">
     <title>Lua.js live demo</title>
     <style type="text/css" media="screen">
-        body,div,p,pre{
-            margin:0;
-            padding:0
+        body {
+            overflow: hidden;
         }
-        body,html {width: 100%; height: 100%; overflow: hidden;}
-        
-        body{
-            /*background: #333;*/
-        }
-        #output{
-            background: #666;
-            overflow-y: scroll;
-        }
-        .container{
-            float: left;
-            width: 160px;
-        }
-        .container > button{
-            background-color: #ffffff;
-            border-style: solid;
-            border-width: 1px 1px 0px 1px;
-            border-color: #808080;
-            display: block;
+        #main-cont.container {
+            max-width: 1920px;
             width: 100%;
+            padding: 0px 30px; 
         }
-        .container > ul{
-            padding: 0px;
-            margin: 0px;
-            border-style: solid;
-            border-width: 1px;
-            border-color: #808080;
+        #loading-screen {
+            height: 100vh;
+            width: 100vw;
+            background: #2A211C;
+            position: absolute;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
         }
-        .member{
-            list-style-type: none;
+        #loading-screen .breaker {
+            flex: 0 1 100%;
         }
-        .select{
-            color: #ff0;
+        #loading-screen .icon img {
+            height: auto; 
+            width: auto; 
+            max-width: 300px; 
+            max-height: 300px;
+        }
+        #loading-screen .message {
+            color: #C5656B;
+            font-family: Consolas;
+            font-size: 16px;
+        }
+        #loading-screen #btn-enter {
+            margin-top: 20px; 
+            font-size: 24px;
+            visibility: hidden;
+        }
+        #logo {
+            display: inline-block;
+        }
+        #logo .title {
+            color: #BDAE9D;
+
+            font-weight: bold;
+            font-size: 90px;
+            font-family: arial, verdana;
+            line-height: normal;
+        }
+
+        #logo .subtitle {
+            background: #BDAE9D;
+            color: #2A211C;
+            
+
+            padding-left: 3px;
+            letter-spacing: 26px;
+
+            font-weight: bold;
+            font-size: 40px;
+            font-family: 'Tahoma', 'Segoe UI', 'Libre Baskerville', serif;
+            text-align: justify;
+            transform: scale(1.0, 0.75);
+            line-height: normal;
+        }
+        #logo .subtitle .last-word {
+            letter-spacing: 0px;
         }
     </style>
 </head>
 <body>
-    <!--
-    <div>
-        <li><a id="run">Compile&Run</a></li>
-        <li><a id="add-friend">Compile</a></li>
+    <div class="btn-group btn-group-sm hidden-bar hidden-left" role="group" aria-label="...">
+        <button type="button" class="btn btn-default toggler"></button>
+        <button type="button" class="btn btn-default">欄位說明</button>
+        <button type="button" class="btn btn-default">下載</button>
+        <button type="button" class="btn btn-default">存檔</button>
+        <button type="button" class="btn btn-default">刪除</button>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          讀檔 <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#">Action</a></li>
+          <li><a href="#">Another action</a></li>
+          <li><a href="#">Something else here</a></li>
+          <li><a href="#">Separated link</a></li>
+        </ul>
+        
     </div>
-    <div style="float:right;color:white;">Lua.js Live demo</div>
-    
-    <div id="output">
-        <div>haha</div>
-        <div>haha</div>
-    </div>
-    -->
-    <div class="example"></div>
-    
-    <script type="application/x-lua" id="lua-main">
-        local a=10
-local x=20
-my_func = function(a)
-    return x + a
-end
-g = my_func(a)
 
+    <div id="main-cont" class="container">
+      <div class="row">
+        <div class="col-xs-3">
+            <div id="json-fixed" class="json-view" style="height: 33vh;">
+                <div class="title"></div>
+                <pre class="scroll-pane"></pre>
+            </div>
+            <div id="json-last-select" class="json-view" style="height: 33vh;">
+                <div class="title"></div>
+                <pre class="scroll-pane"></pre>
+            </div>
+            <div id="json-preview" class="json-view" style="height: 33vh;">
+                <div class="title"></div>
+                <pre class="scroll-pane"></pre>
+            </div>
+        </div>
+        <div class="col-xs-9">
+            <div id="event-logging" class="event-view json-view" style="height: 24vh;"><pre class="scroll-pane"></pre></div>
+            <div id="workspace" class="scroll-pane">
+                
+            </div>
+        </div>
+      </div>
+    </div>
+    <div id="loading-screen">
+        <div class="icon"><img src="asset/愛麗絲妖精.png"></img></div>
+        <div id="logo">
+            <div class="title">ElfWash</div>
+            <div class="subtitle">LOADIN<span class="last-word">G</span></div>
+        </div>
+        <div class="breaker"></div>
+        <div id="loading-message" class="message">requirejs : ...</div>
+        <div class="breaker"></div>
+        <button id="btn-enter">Enter</button>
+    </div>
+
+    <script src="bower_components/requirejs/require.js"></script>
+    <script src="js/config.js"></script>
+    <script>
+    requirejs.onResourceLoad = function (context, map, depArray) {
+        var message = map.id + ': ' + map.url
+        document.getElementById("loading-message").innerHTML = message;
+        console.log(message);
+    }
     </script>
-    
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/underscore/underscore.js"></script>
-    <script src="bower_components/backbone/backbone.js"></script>
-    <script src="thirdparty/lua.js"></script>
-    
-    
-    <!-- sensei-grid and their dependcies -->
-    <link rel="stylesheet" type="text/css" href="bower_components/sensei-grid/dist/sensei-grid.css"/>
-    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.css"/>
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/lodash/lodash.min.js"></script>
-    <script src="bower_components/sensei-grid/dist/sensei-grid.js"></script>
-    
-    
-    <script src="src/main.js"></script>
-    
+    <script src="js/run-main.js"></script>
 </body>
 </html>
