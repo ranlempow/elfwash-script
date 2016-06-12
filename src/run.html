@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Lua.js live demo</title>
+    <style type="text/css" media="screen">
+        body {
+            overflow: hidden;
+        }
+        #main-cont.container {
+            max-width: 1920px;
+            width: 100%;
+            padding: 0px 30px; 
+        }
+        #loading-screen {
+            height: 100vh;
+            width: 100vw;
+            background: #2A211C;
+            position: absolute;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+        }
+        #loading-screen .breaker {
+            flex: 0 1 100%;
+        }
+        #loading-screen .icon img {
+            height: auto; 
+            width: auto; 
+            max-width: 300px; 
+            max-height: 300px;
+        }
+        #loading-screen .message {
+            color: #C5656B;
+            font-family: Consolas;
+            font-size: 16px;
+        }
+        #loading-screen #btn-enter {
+            margin-top: 20px; 
+            font-size: 24px;
+            visibility: hidden;
+        }
+        #logo {
+            display: inline-block;
+        }
+        #logo .title {
+            color: #BDAE9D;
+
+            font-weight: bold;
+            font-size: 90px;
+            font-family: arial, verdana;
+            line-height: normal;
+        }
+
+        #logo .subtitle {
+            background: #BDAE9D;
+            color: #2A211C;
+            
+
+            padding-left: 3px;
+            letter-spacing: 26px;
+
+            font-weight: bold;
+            font-size: 40px;
+            font-family: 'Tahoma', 'Segoe UI', 'Libre Baskerville', serif;
+            text-align: justify;
+            transform: scale(1.0, 0.75);
+            line-height: normal;
+        }
+        #logo .subtitle .last-word {
+            letter-spacing: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="btn-group btn-group-sm hidden-bar hidden-left" role="group" aria-label="...">
+        <button type="button" class="btn btn-default toggler"></button>
+        <button type="button" class="btn btn-default">欄位說明</button>
+        <button type="button" class="btn btn-default">下載</button>
+        <button type="button" class="btn btn-default">存檔</button>
+        <button type="button" class="btn btn-default">刪除</button>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          讀檔 <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#">Action</a></li>
+          <li><a href="#">Another action</a></li>
+          <li><a href="#">Something else here</a></li>
+          <li><a href="#">Separated link</a></li>
+        </ul>
+        
+    </div>
+
+    <div id="main-cont" class="container">
+      <div class="row">
+        <div class="col-xs-3">
+            <div id="json-fixed" class="json-view" style="height: 33vh;">
+                <div class="title"></div>
+                <pre class="scroll-pane"></pre>
+            </div>
+            <div id="json-last-select" class="json-view" style="height: 33vh;">
+                <div class="title"></div>
+                <pre class="scroll-pane"></pre>
+            </div>
+            <div id="json-preview" class="json-view" style="height: 33vh;">
+                <div class="title"></div>
+                <pre class="scroll-pane"></pre>
+            </div>
+        </div>
+        <div class="col-xs-9">
+            <div id="event-logging" class="event-view json-view" style="height: 24vh;"><pre class="scroll-pane"></pre></div>
+            <div id="workspace" class="scroll-pane">
+                
+            </div>
+        </div>
+      </div>
+    </div>
+    <div id="loading-screen">
+        <div class="icon"><img src="asset/愛麗絲妖精.png"></img></div>
+        <div id="logo">
+            <div class="title">ElfWash</div>
+            <div class="subtitle">LOADIN<span class="last-word">G</span></div>
+        </div>
+        <div class="breaker"></div>
+        <div id="loading-message" class="message">requirejs : ...</div>
+        <div class="breaker"></div>
+        <button id="btn-enter">Enter</button>
+    </div>
+
+    <script src="bower_components/requirejs/require.js"></script>
+    <script src="js/config.js"></script>
+    <script>
+    requirejs.onResourceLoad = function (context, map, depArray) {
+        var message = map.id + ': ' + map.url
+        document.getElementById("loading-message").innerHTML = message;
+        console.log(message);
+    }
+    </script>
+    <script src="js/run-main.js"></script>
+</body>
+</html>

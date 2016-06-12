@@ -1,4 +1,6 @@
-$(function () {
+
+require(['jquery', 'bootstrap', 'hiddenbar', 'domReady!'], 
+  function ($) {
 
   var data = [
       {id: 1, title: "test"},

@@ -47,6 +47,6 @@ dist
 secret.json
 
 # Sublime Text
+sublime
 *.sublime-project
 *.sublime-workspace
-sublt.cmd

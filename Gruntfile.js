@@ -1,10 +1,9 @@
 module.exports = function(grunt) {
-  var _ = require('lodash');
   var ssh_secret = null;
   try {
-    ssh_secret = grunt.file.readJSON('secret.json')
+    ssh_secret = grunt.file.readJSON('config/ssh-deploy/secret.json')
   } catch (e) {
-    ssh_secret = grunt.file.readJSON('secret.template.json')
+    ssh_secret = grunt.file.readJSON('config/ssh-deploy/secret.template.json')
   }
 
   // Project configuration.
@@ -12,7 +11,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     
     // configure of build processing
-    'template': {
+    template: {
       options: {
         // Task-specific options go here
       },
@@ -20,34 +19,56 @@ module.exports = function(grunt) {
         options: {
           data: function() {
             return {
-              'mainlua': grunt.file.read('src/js/main.lua'),
+              'mainlua': grunt.file.read('src/lua/main.lua'),
               'changelog': grunt.file.read('CHANGELOG.md'),
             }
           }
         },
         files: {
-          'dist/run.html': ['src/run.tpl.html'],
           'dist/index.html': ['src/index.tpl.html'],
         }
       }
     },
     watch: {
       files: ['src/**'],
-      tasks: ['template', 'copy']
+      tasks: ['build']
     },
     copy: {
       main: {
         files: [
           {expand: true, src: ['bower_components/*/*.js', 'bower_components/*/*.css',
-                               'bower_components/*/dist/**/*.js', 'bower_components/*/dist/**/*.css', ], //, 'bower_components/*/dist/css/*.css'],
+                               'bower_components/*/dist/**/*.js', 'bower_components/*/dist/**/*.css',
+                               'bower_components/*/build/*.js',
+                               'bower_components/*/script/*.js', 'bower_components/*/style/*.css'], //, 'bower_components/*/dist/css/*.css'],
             dest: 'dist/'
           },
+          {expand: true, src: ['bower_components/bootstrap/dist/fonts/*'], dest: 'dist/'},
+          {expand: true, src: ['node_modules/keycode/index.js'], dest: 'dist/'},
           {expand: true, src: ['thirdparty/lua.js'], dest: 'dist/'},
-          {expand: true, cwd:"src/", src: ['js/*.js', '*.html', '!*.tpl.html'], dest: 'dist/'},
+          {expand: true, cwd:"src/", src: ['js/*.js', 'lua/*.lua', 'css/*.css', '*.html', '!*.tpl.html'], dest: 'dist/'},
         ],
       },
     },
-    
+    luajstr:{
+      main: {
+        files: [
+          {expand: true, cwd:"src/", src: ['lua/*.lua'], dest: 'dist/', ext: '.lua.js'},
+        ]
+      }
+    },
+    espower: {
+      main: {
+        files: [
+          {
+            expand: true,        // Enable dynamic expansion.
+            cwd: 'src/',        // Src matches are relative to this path.
+            src: ['**/*.js'],    // Actual pattern(s) to match.
+            dest: 'dist/',  // Destination path prefix.
+            ext: '.js'           // Dest filepaths will have this extension.
+          }
+        ]
+      }
+    },
     // configure of grunt-ssh-deploy
     secret: ssh_secret,
     environments: {
@@ -87,6 +108,18 @@ module.exports = function(grunt) {
         regExp: false
       }
     },
+
+    // less
+    less: {
+      development: {
+        options: {
+          paths: ['src/css']
+        },
+        files: {
+          'dist/css/basic.css': 'src/css/basic.less'
+        }
+      }
+    }
   });
 
 
@@ -95,58 +128,38 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-ssh-deploy');
   grunt.loadNpmTasks('grunt-bump');
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-espower');
   
-
-  grunt.registerMultiTask('template-no-escape', 'Interpolate template files with any data you provide', function() {
-    // Merge task-specific and/or target-specific options with these defaults:
-    var options = this.options({
-      'data': {},
-    });
-
-    // Iterate over all specified file groups.
+  grunt.registerMultiTask('luajstr', function (){
+    var options = this.options();
     this.files.forEach(function(file) {
-      // Concat specified files.
-      var src = file.src.filter(function(filePath) {
-        // Warn on and remove invalid source files.
-        if (!grunt.file.exists(filePath)) {
-          grunt.log.warn('Source file `' + filePath + '` not found.');
+      var contents = file.src.filter(function(filepath) {
+        // Remove nonexistent files (it's up to you to filter or warn here).
+        if (!grunt.file.exists(filepath)) {
+          grunt.log.warn('Source file "' + filepath + '" not found.');
           return false;
         } else {
           return true;
         }
+      }).map(function(filepath) {
+        // Read and return the file's source.
+        return grunt.file.read(filepath);
+      }).join('\n').replace(/\\/g, '\\\\').replace(/"/g, '\\"').split('\n').map(function(line) {
+        return '    "'+ line.slice(0, -1) + '\\n" +'
       });
-      if (!src.length) {
-        grunt.log.warn(
-          'Destination `' + file.dest +
-          '` not written because `src` files were empty.'
-        );
-        return;
-      }
-      var template = src.map(function(filePath) {
-        // Read file source.
-        return grunt.file.read(filePath);
-      }).join('\n');
+      contents.splice(0, 0, 'define(function() {');
+      contents.splice(1, 0, 'var code = "" +');
+      contents.push('    "";');
+      contents.push('  return {code:code};');
+      contents.push('});');
+      contents = contents.join('\n');
 
-      var data =  typeof options.data == 'function' ?
-        options.data() :
-        options.data
-      
-      var compiled = _.template(template, {escape:''});
-
-      var result = compiled(data); 
-      grunt.log.writeln(data.mainlua)
-      //var result = grunt.template.process(template, templateOptions);
-
-      // Write the destination file
-      grunt.file.write(file.dest, result);
-
-      // Print a success message
-      grunt.log.writeln('File `' + file.dest + '` created.');
+      grunt.file.write(file.dest, contents);
+      grunt.log.writeln('File "' + file.dest + '" created.');
     });
   });
 
-
-  
   grunt.registerTask('changelog', 'update changelog (most combine with bump, and after bump).', function() {
     var fs = require('fs');
     
@@ -208,7 +221,7 @@ module.exports = function(grunt) {
   });
 
 
-  grunt.registerTask('build', ['template', 'copy']);
+  grunt.registerTask('build', ['template', 'copy', 'less', 'luajstr']);
 
   grunt.registerTask('deploy-github', ['build', 'upload-github']);
   grunt.registerTask('deploy-gamelab', ['build', 'ssh_deploy:production']);
