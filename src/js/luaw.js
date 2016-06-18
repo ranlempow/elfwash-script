@@ -1,4 +1,9 @@
-define(['luajs'], function (Lua) {
+// patch lua.js
+// "  lua_require(G, name);\n" +  ---->
+// "  return [lua_require(G, name)];\n" +
+
+define(['luajs', 'js/logging'], function (Lua, logging) {
+  var logging = logging.getLogger('Lua');
 
   var _array_metatable = Lua.lua_newtable(false, '__newindex', function(table, key, value) {
     if (!Number.isInteger(key)) {
@@ -77,6 +82,18 @@ define(['luajs'], function (Lua) {
     args[2] = lua_wrap(args[2]);
     return Lua.lua_tableset.apply(this, args);
   }
+
+  Lua.lua_tablesetw_metaindex = function(table, key, value) {
+    var args = Array.prototype.slice.call(arguments);
+    if (table.metatable && table.metatable.str['__index'] !== undefined) {
+      return Lua.lua_tablesetw(table.metatable.str['__index'], key, value);
+    } else {
+      return Lua.lua_tablesetw(table, key, value);
+    }
+    
+    args[2] = lua_wrap(args[2]);
+    return Lua.lua_tableset.apply(this, args);
+  }
   
   Lua.lua_tablegetw = function() {
     return lua_unwrap(Lua.lua_tableget.apply(this, arguments));
@@ -114,14 +131,14 @@ define(['luajs'], function (Lua) {
     if (!pre.t.metatable) {
       pre.t.metatable = lua_newtable();
     }
-    console.log(pre.t)
+    //console.log(pre.t)
     pre.t.metatable.str['__index'] = G;
     return pre.t
   }
 
   Lua.lua_module = function(name) {
-    var t = lua_tableget(lua_packages, name);
-    console.log(t)
+    var t = lua_tableget(Lua.lua_packages, name);
+    //console.log(t)
     if (t == null) {
       t = lua_load_from_preload(name);
     }
@@ -131,5 +148,80 @@ define(['luajs'], function (Lua) {
     return t;
   }
 
+  Lua.unload_all = function() {
+    Lua.lua_preload_packages = {};
+    Lua.lua_packages = lua_newtable();
+  }
+
+  var default_lua_core = _.clone(Lua.lua_core);
+  var default_lua_libs = _.clone(Lua.lua_libs);
+
+  Lua.lib = function(name, attributes) {
+    if (attributes === undefined) {
+      attributes = name;
+      name = '*';
+    }
+
+    var library;
+    if (name == '*') {
+      if (attributes === null) {
+        Lua.lua_core = _.clone(default_lua_core);
+        Lua.lua_libs = _.clone(default_lua_libs);
+        retrun;
+      }
+      library = Lua.lua_core;
+    } else {
+      if (attributes === null) {
+        Lua.lua_libs[name] = undefined;
+        return;
+      }
+      if (Lua.lua_libs[name] == undefined) Lua.lua_libs[name] = {};
+      library = Lua.lua_libs[name];
+    }
+    for (var k in attributes) {
+      library[k] = Lua.lua_wrap(attributes[k]);
+    }
+  }
+
+  Lua.load = function(module_paths, success) {
+    require.undef('lua/lua_modules');
+    require(['lua/lua_modules'], function(modules) {
+      var name_list = [];
+      for (var i in module_paths) {
+        var path = module_paths[i];
+        var name, implement;
+        
+        for (var modname in modules) {
+          for(var j in modules[modname]) {
+            if (modules[modname][j].path == path) {
+              name = modules[modname][j].name;
+              implement = modules[modname][j].implement;
+              break;
+            }
+          }
+        }
+        if (name === undefined) {
+          logging.warn('module path ' + path + ' not found');
+          continue;
+        }
+        logging.debug('module ' + name + '[' + implement + '] ready');
+        require.undef(path);
+        name_list.push(name);
+      }
+      require(module_paths, function() {
+        Lua.unload_all();
+        for (var i in module_paths) {
+          //var path = module_paths[i];
+          console.log([name_list[i], arguments[i].code]);
+          Lua.lua_preload_from_code(name_list[i], arguments[i].code);
+        }
+        success();
+      });
+    });
+  }
+  
+  Lua.set = Lua.lua_tablesetw_metaindex;
+  Lua.get = Lua.lua_tablegetw;
+  Lua.call = Lua.lua_tablegetcallw;
   return Lua;
 });

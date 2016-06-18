@@ -1,195 +1,205 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Condensed:400,700);
+@import "theme-Espresso_Libre.less";
 
-@theme-user-defined-constant: #C5656B;
-@theme-background: #2A211C;
-@theme-foreground: #BDAE9D;
-@theme-highlight: #3A312C;
+// @import (reference) "bootstrap/less/mixins.less";
+// @import (reference) "bootstrap/less/variables.less";
 
-@theme-comment: #3A312C;
-@theme-keyword: #3A312C;
-@theme-number: #44EA43;
-@theme-user-defined-constant: #C5656B;
-@theme-builtin-constant: #585CF6;
-@theme-variable: #318495;
-@theme-string: #44AA43;
-@theme-string-interpolation: #2FE420;
-@theme-preprocessor-line: #1A921C;
-@theme-preprocessor-directive: #9AFF87;
-@theme-function-name: #FF9358;
+@body-background: darken(@theme-background, 5%);
+@member-icon-size: 32px;
 
+.flex-container-rowfree {
+	flex-direction: row;
+	flex-wrap: wrap;
+	display: flex;
+}
 
-@theme-operator: #687687;
+.flex-children {
+	flex: 0 1 auto;
+}
 
-@theme-ident: #BDAE9D;
-
-
-@theme-regexp: #44CA43;
-
-.mixin-user-defined-constant {
-	color: @theme-user-defined-constant;
-	font-weight: bold;
+.flex-breaker {
+	flex: 0 1 100%;
 }
 
 
 body {
-	background: darken(@theme-background, 5%);
-	color: @theme-foreground;
+	.theme;
+	background: @body-background;
 	border-color: @theme-foreground;
 	font-family: lato, "Roboto Condensed";
+
+}
+::selection {
+  background-color: @theme-selection;
 }
 
 button {
-	background: darken(@theme-background, 0%);
+	background: @theme-background;
 	border: 1px solid;
 	padding: 1px 16px;
   display: block;
+  outline:none;
 }
 
+
+div.workspace {
+	.flex-container-rowfree;
+	height: 75vh;
+	margin: 1px;
+	overflow-y: scroll;
+	div.group {
+		.flex-children;
+	}
+	div.breaker {
+		.flex-breaker;
+	}
+}
+
+.ui-border {
+	border-style: solid;
+  border-width: 1px;
+  border-radius: 3px;
+}
+
+div.group {
+  width: 210px;
+  border: 5px solid @body-background;
+  &:focus {
+  	border: 5px solid @theme-background;
+  	outline:none;
+  }
+  & > span.title {
+  	font-weight: bold;
+  }
+
+  .button-group {
+  	.flex-container-rowfree;
+	  	button {
+	  	.ui-border;
+		  flex: 1 1 auto;
+		  font-size: 16px;
+		  &:hover {
+			  background: #000;
+			}
+			&:active {
+				background: #fff;
+			}
+			&.active {
+				background: #fff;
+			}
+		}
+  }
+
+	& > ul {
+		.ui-border;
+	  padding: 0px;
+	  margin: 0px;
+		li.member {
+		  list-style-type: none;
+		  cursor: pointer;
+
+		  &.select {
+			  .theme-user-defined-constant;
+			  background: @theme-lineHighlight;
+			}
+			&.last-select {
+			  .theme-user-defined-constant;
+			  color: lighten(@theme-user-defined-constant-foreground, 20%);
+			}
+			& span.title {
+				padding: ((@member-icon-size - 20px) / 2) 2px;
+			}
+			&	img {
+		  	height: @member-icon-size;
+		  	width: @member-icon-size;
+		  }
+		  & span.glyphicon {
+		  	padding: 4px;
+		  	font-size: @member-icon-size - 4px * 2;
+		  }
+		}
+	}
+}
+
+
+
+div.json-viewer pre {
+	.theme;
+	.ui-border;
+	padding: 0px;
+  line-height: 1.2;
+	span.string {
+		.theme-string;
+	}
+	span.number {
+		.theme-number;
+	}
+	span.quota {
+		.theme-preprocessor-line;
+	}
+	span.changed {
+		.theme-user-defined-constant;
+	}
+	span.importants {
+		font-weight: bold;
+	}
+}
+
+div.event-viewer pre {
+	height: 100%;
+
+  span.record {
+  	padding-left: 12px; 
+  	display: block;
+  	&.trace {
+  		.theme-js-operator;
+	  }
+	  &.debug {
+	  	color: @theme-invisibles;
+	  }
+	  &.info {
+
+	  }
+	  &.warn {
+	  	color: #fff;
+	  	background: darken(yellow, 10%);
+	  }
+	  &.error {
+	  	color: #fff;
+	  	background: darken(red, 20%);
+	  }
+	  &.fatal {
+	  	color: #fff;
+	  	background: darken(red, 10%);
+	  }
+	  &.fail {
+	  	background: darken(red, 30%);
+	  }
+	  &.success {
+	  	background: @theme-preprocessor-line-foreground;
+	  }
+	  &.system {
+	  	.theme-string-interpolation;
+	  }
+	}
+
+  span.timestamp {
+		.theme-js-operator;
+  	float: right;
+  }
+
+  span.tag {
+  	margin: 0px 10px;
+  	font-weight: bold;
+  }
+}
+
+
+/*
 .jspDrag {
 	background: lighten(@theme-background, 20%);
 }
 .jspTrack {
 	background: lighten(@theme-background, 5%);
 }
-
-#workspace {
-	margin: 1px;
-	display: flex;
-	flex-flow: row wrap;
-	height: 75vh;
-	overflow-y: scroll;
-	.obj-container {
-		flex: 0 1 auto;
-	}
-	.breaker {
-		flex: 0 1 100%;
-	}
-}
-
-.obj-container {
-  width: 210px;
-  padding: 0px;
-  border: 5px solid darken(@theme-background, 5%);
-  &:focus {
-  	border: 5px solid darken(@theme-background, 0%);
-  	outline:none;
-  }
-  .title {
-  	font-weight: bold;
-  }
-  .button-group {
-  	display: flex;
-  	flex-wrap: wrap;
-  }
-  .button-group button {
-  	border-radius: 3px;
-	  flex: 1 1 auto;
-	  font-size: 16px;
-	  &:hover {
-		  background: #000;
-		}
-		&:active {
-			background: #fff;
-		}
-		&.active {
-			background: #fff;
-		}
-	}
-
-	& > ul {
-	  padding: 0px;
-	  margin: 0px;
-	  border-style: solid;
-	  border-width: 1px;
-	  border-radius: 3px;
-	  img {
-	  	height: 32px;
-	  	width: 32px;
-	  }
-	  .glyphicon {
-	  	padding: 4px;
-	  	font-size: 24px;
-	  }
-	  .title {
-		  font-weight: bold;
-		  text-align: center;
-		}
-		.member {
-		  list-style-type: none;
-		  cursor: pointer;
-		}
-		.member.select {
-		  .mixin-user-defined-constant;
-		}
-		.member.last-select {
-		  .mixin-user-defined-constant;
-		  color: lighten(@theme-user-defined-constant, 20%);
-		}
-	}
-}
-
-
-
-.json-view pre {
-	padding: 0px;
-  line-height: 1.2;
-  background: @theme-background;
-  color: @theme-foreground;
-  &::selection {
-	  background: @theme-highlight;
-	}
-	span::selection {
-	  background: @theme-highlight;
-	}
-	.string {
-		color: @theme-string;
-	}
-	.number {
-		color: @theme-number;
-	}
-	.quota {
-		color: @theme-regexp;
-	}
-	.changed {
-		color: @theme-user-defined-constant;
-	}
-	.importants {
-		font-weight: bold;
-	}
-}
-
-.event-view pre {
-	height: 100%;
-	padding-left: 15px; 
-	.record:nth-child(n+2):before {
-    content: '\a';
-  }
-  .record.trace {
-		color: @theme-operator;
-  }
-  .record.debug {
-  }
-  .record.info {
-  }
-  .record.warn {
-  	background: yellow;
-  }
-  .record.error {
-  	color: #fff;
-  	background: #990000;
-  }
-  .record.fatal {
-  	color: #fff;
-  	background: red;
-  }
-
-
-  .timestamp {
-  	float: right;
-  	color: #888;
-  }
-  .tag {
-  	margin: 0px 10px;
-  	font-weight: bold;
-  }
-}
+*/

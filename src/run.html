@@ -43,6 +43,7 @@
             font-size: 16px;
         }
         #loading-screen #btn-enter {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
             margin-top: 20px; 
             font-size: 24px;
             visibility: hidden;
@@ -80,43 +81,28 @@
     </style>
 </head>
 <body>
-    <div class="btn-group btn-group-sm hidden-bar hidden-left" role="group" aria-label="...">
-        <button type="button" class="btn btn-default toggler"></button>
-        <button type="button" class="btn btn-default">欄位說明</button>
-        <button type="button" class="btn btn-default">下載</button>
-        <button type="button" class="btn btn-default">存檔</button>
-        <button type="button" class="btn btn-default">刪除</button>
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          讀檔 <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-          <li><a href="#">Action</a></li>
-          <li><a href="#">Another action</a></li>
-          <li><a href="#">Something else here</a></li>
-          <li><a href="#">Separated link</a></li>
-        </ul>
-        
-    </div>
+    <div class="hidden-bar-overlay hidden-left"></div>
+    <div class="hidden-bar-overlay hidden-right"></div>
 
     <div id="main-cont" class="container">
       <div class="row">
         <div class="col-xs-3">
-            <div id="json-fixed" class="json-view" style="height: 33vh;">
+            <div id="json-fixed" class="json-viewer" style="height: 33vh;">
                 <div class="title"></div>
                 <pre class="scroll-pane"></pre>
             </div>
-            <div id="json-last-select" class="json-view" style="height: 33vh;">
+            <div id="json-last-select" class="json-viewer" style="height: 33vh;">
                 <div class="title"></div>
                 <pre class="scroll-pane"></pre>
             </div>
-            <div id="json-preview" class="json-view" style="height: 33vh;">
+            <div id="json-preview" class="json-viewer" style="height: 33vh;">
                 <div class="title"></div>
                 <pre class="scroll-pane"></pre>
             </div>
         </div>
         <div class="col-xs-9">
-            <div id="event-logging" class="event-view json-view" style="height: 24vh;"><pre class="scroll-pane"></pre></div>
-            <div id="workspace" class="scroll-pane">
+            <div id="event-logging" class="event-viewer json-viewer" style="height: 24vh;"><pre class="scroll-pane"></pre></div>
+            <div id="workspace" class="workspace scroll-pane">
                 
             </div>
         </div>
@@ -131,7 +117,7 @@
         <div class="breaker"></div>
         <div id="loading-message" class="message">requirejs : ...</div>
         <div class="breaker"></div>
-        <button id="btn-enter">Enter</button>
+        <button id="btn-enter" class="btn btn-success">Enter</button>
     </div>
 
     <script src="bower_components/requirejs/require.js"></script>
@@ -142,7 +128,19 @@
         document.getElementById("loading-message").innerHTML = message;
         console.log(message);
     }
+    if(window.location.hash) {
+        //console.log(window.location.hash);
+        var entrypoints = window.location.hash.replace(/^#/, '').split(',');
+        // TODO: chain require() ---> require(rqurier(...));
+        console.log(entrypoints);
+        require(['js/system', 'js/logging', 'js/runui', 'domReady!', 'font-awesome'].concat(entrypoints), function(system, logging, mv) {
+            system.init(function() {
+                mv.init();
+                logging('info', 'system.init', 'ok');
+            })
+        });
+    }
     </script>
-    <script src="js/run-main.js"></script>
+    <!--<script src="js/run-main.js"></script>-->
 </body>
 </html>

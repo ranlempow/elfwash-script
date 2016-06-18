@@ -1,0 +1,171 @@
+@theme-foreground: #BDAE9D;
+@theme-caret: #889AFF;
+@theme-background: #2A211C;
+@theme-invisibles: #BFBFBF;
+@theme-lineHighlight: #3A312C;
+@theme-selection: #C3DCFF;
+@theme-comment-foreground: #0066FF;
+@theme-keyword-foreground: #43A8ED;
+@theme-number-foreground: #44AA43;
+@theme-user-defined-constant-foreground: #C5656B;
+@theme-built-in-constant-foreground: #585CF6;
+@theme-variable-foreground: #318495;
+@theme-string-foreground: #049B0A;
+@theme-string-interpolation-foreground: #2FE420;
+@theme-preprocessor-line-foreground: #1A921C;
+@theme-preprocessor-directive-foreground: #9AFF87;
+@theme-function-name-foreground: #FF9358;
+@theme-function-argument-and-result-types-foreground: #8B8E9C;
+@theme-library-function-foreground: #7290D9;
+@theme-library-object-foreground: #6D79DE;
+@theme-library-constant-foreground: #00AF0E;
+@theme-library-variable-foreground: #2F5FE0;
+@theme-js-operator-foreground: #687687;
+@theme-invalid-foreground: #FFFFFF;
+@theme-invalid-background: #990000;
+@theme-invalid-trailing-whitespace-background: #FFD0D0;
+@theme-embedded-source-background: #F5AA7730;
+@theme-markup-xml-declaration-foreground: #8F7E65;
+@theme-markup-doctype-foreground: #888888;
+@theme-markup-tag-foreground: #43A8ED;
+
+.theme {
+  color: @theme-foreground;
+  background-color: @theme-background;
+
+  &::selection {
+    background-color: @theme-selection;
+  }
+
+}
+
+.theme-comment {
+  font-style: italic;
+  color: @theme-comment-foreground;
+}
+
+.theme-keyword {
+  font-weight: bold;
+  color: @theme-keyword-foreground;
+}
+
+.theme-number {
+  color: @theme-number-foreground;
+}
+
+.theme-user-defined-constant {
+  font-weight: bold;
+  color: @theme-user-defined-constant-foreground;
+}
+
+.theme-built-in-constant {
+  font-weight: bold;
+  color: @theme-built-in-constant-foreground;
+}
+
+.theme-variable {
+  color: @theme-variable-foreground;
+}
+
+.theme-string {
+  color: @theme-string-foreground;
+}
+
+.theme-string-interpolation {
+  color: @theme-string-interpolation-foreground;
+}
+
+.theme-preprocessor-line {
+  color: @theme-preprocessor-line-foreground;
+}
+
+.theme-preprocessor-directive {
+  font-weight: bold;
+  color: @theme-preprocessor-directive-foreground;
+}
+
+.theme-function-name {
+  font-weight: bold;
+  color: @theme-function-name-foreground;
+}
+
+.theme-type-name {
+  text-decoration: underline;
+}
+
+.theme-inherited-class-name {
+  font-style: italic;
+}
+
+.theme-function-parameter {
+  font-style: italic;
+}
+
+.theme-function-argument-and-result-types {
+  color: @theme-function-argument-and-result-types-foreground;
+}
+
+.theme-section {
+  font-style: italic;
+}
+
+.theme-library-function {
+  font-weight: bold;
+  color: @theme-library-function-foreground;
+}
+
+.theme-library-object {
+  font-weight: bold;
+  color: @theme-library-object-foreground;
+}
+
+.theme-library-constant {
+  font-weight: bold;
+  color: @theme-library-constant-foreground;
+}
+
+.theme-library-variable {
+  font-weight: bold;
+  color: @theme-library-variable-foreground;
+}
+
+.theme-js-operator {
+  color: @theme-js-operator-foreground;
+}
+
+.theme-invalid {
+  color: @theme-invalid-foreground;
+  background-color: @theme-invalid-background;
+}
+
+.theme-invalid-trailing-whitespace {
+  background-color: @theme-invalid-trailing-whitespace-background;
+}
+
+.theme-embedded-source {
+  background-color: @theme-embedded-source-background;
+}
+
+.theme-markup-xml-declaration {
+  color: @theme-markup-xml-declaration-foreground;
+}
+
+.theme-markup-doctype {
+  color: @theme-markup-doctype-foreground;
+}
+
+.theme-markup-dtd {
+  font-style: italic;
+}
+
+.theme-markup-tag {
+  color: @theme-markup-tag-foreground;
+}
+
+.theme-markup-name-of-tag {
+  font-weight: bold;
+}
+
+.theme-markup-tag-attribute {
+  font-style: italic;
+}

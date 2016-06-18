@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+  var assert = require('assert')
   var ssh_secret = null;
   try {
     ssh_secret = grunt.file.readJSON('config/ssh-deploy/secret.json')
@@ -39,20 +40,24 @@ module.exports = function(grunt) {
           {expand: true, src: ['bower_components/*/*.js', 'bower_components/*/*.css',
                                'bower_components/*/dist/**/*.js', 'bower_components/*/dist/**/*.css',
                                'bower_components/*/build/*.js',
-                               'bower_components/*/script/*.js', 'bower_components/*/style/*.css'], //, 'bower_components/*/dist/css/*.css'],
+                               'bower_components/*/script/*.js', 'bower_components/*/style/*.css', 'bower_components/*/css/*.css'], //, 'bower_components/*/dist/css/*.css'],
             dest: 'dist/'
           },
-          {expand: true, src: ['bower_components/bootstrap/dist/fonts/*'], dest: 'dist/'},
+          {expand: true, src: ['bower_components/*/dist/fonts/*', 'bower_components/*/fonts/*'], dest: 'dist/'},
           {expand: true, src: ['node_modules/keycode/index.js'], dest: 'dist/'},
           {expand: true, src: ['thirdparty/lua.js'], dest: 'dist/'},
-          {expand: true, cwd:"src/", src: ['js/*.js', 'lua/*.lua', 'css/*.css', '*.html', '!*.tpl.html'], dest: 'dist/'},
+          {expand: true, cwd:"src/", src: ['js/**/*.js', 'lua/**/*.lua', 'css/**/*.css', '*.html', '!*.tpl.html'], dest: 'dist/'},
         ],
       },
     },
-    luajstr:{
+    luamodulize:{
       main: {
+        options: {
+          basedir: 'dist/',
+          configdir: 'dist/lua/',
+        },
         files: [
-          {expand: true, cwd:"src/", src: ['lua/*.lua'], dest: 'dist/', ext: '.lua.js'},
+          {expand: true, cwd:"src/", src: ['lua/**/*.lua'], dest: 'dist/', ext: '.lua.js', extDot: 'last'},
         ]
       }
     },
@@ -113,11 +118,11 @@ module.exports = function(grunt) {
     less: {
       development: {
         options: {
-          paths: ['src/css']
+          paths: ['src/css/', 'bower_components/']
         },
-        files: {
-          'dist/css/basic.css': 'src/css/basic.less'
-        }
+        files: [
+          {expand: true, cwd:"src/", src: ['css/**/*.less'], dest: 'dist/', ext: '.css', extDot: 'last'},
+        ]
       }
     }
   });
@@ -131,20 +136,21 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-espower');
   
-  grunt.registerMultiTask('luajstr', function (){
+  grunt.registerMultiTask('luamodulize', function (){
     var options = this.options();
+    var lua_modules = {};
     this.files.forEach(function(file) {
-      var contents = file.src.filter(function(filepath) {
+      var contents = file.src.filter(function(path) {
         // Remove nonexistent files (it's up to you to filter or warn here).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
+        if (!grunt.file.exists(path)) {
+          grunt.log.warn('Source file "' + path + '" not found.');
           return false;
         } else {
           return true;
         }
-      }).map(function(filepath) {
+      }).map(function(path) {
         // Read and return the file's source.
-        return grunt.file.read(filepath);
+        return grunt.file.read(path);
       }).join('\n').replace(/\\/g, '\\\\').replace(/"/g, '\\"').split('\n').map(function(line) {
         return '    "'+ line.slice(0, -1) + '\\n" +'
       });
@@ -157,7 +163,37 @@ module.exports = function(grunt) {
 
       grunt.file.write(file.dest, contents);
       grunt.log.writeln('File "' + file.dest + '" created.');
+
+      var path = file.dest.replace(new RegExp('^' + options.basedir), '').replace(/\.js$/, '');
+      var comps = file.dest.replace(new RegExp('^' + options.configdir), '').split('/');
+
+      var basename = comps[comps.length - 1]; 
+      var words = basename.split('.');
+      assert(words[words.length - 1] == 'js')
+      assert(words[words.length - 2] == 'lua')
+      assert(words.length == 3 || words.length == 4)
+      var parent = comps.slice(0, comps.length - 1);
+      var module_name = parent.concat([words[0]]).join('.');
+      if (words.length == 3) {
+        implement_name = module_name;
+      } else {
+        implement_name = parent.concat([words[1]]).join('.');
+      }
+      if (lua_modules[module_name] === undefined) lua_modules[module_name] = [];
+      lua_modules[module_name].push({
+        name: module_name,
+        implement: implement_name,
+        path: path,
+      });
     });
+    var contents = [
+      'define(function() {',
+      '  var modules = ' + JSON.stringify(lua_modules, null, 2).replace(/\n/g, '\n  ') + ';',
+      '  return modules;',
+      '});'
+    ]
+    contents = contents.join('\n')
+    grunt.file.write(options.configdir + 'lua_modules.js', contents);
   });
 
   grunt.registerTask('changelog', 'update changelog (most combine with bump, and after bump).', function() {
@@ -221,7 +257,7 @@ module.exports = function(grunt) {
   });
 
 
-  grunt.registerTask('build', ['template', 'copy', 'less', 'luajstr']);
+  grunt.registerTask('build', ['template', 'copy', 'less', 'luamodulize']);
 
   grunt.registerTask('deploy-github', ['build', 'upload-github']);
   grunt.registerTask('deploy-gamelab', ['build', 'ssh_deploy:production']);

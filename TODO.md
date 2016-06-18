@@ -1,3 +1,12 @@
+// TODO: hidden-bar .set()
+// TODO: hidden-bar package="" then remove
+// TODO: hidden-bar group=divder+header, add_to_group
+// TODO: hidden-bar bar-icon
+// TODO: 中文化: 錯誤訊息, 型別名稱
+// TODO: cmds快速鍵
+// TODO: hidden-bar lazy
+// TODO: 解說用UI
+// TODO: hidden-bar 好用功能: list, chackbox
 
 ## 進度規劃
 

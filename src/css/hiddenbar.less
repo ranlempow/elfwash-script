@@ -1,0 +1,131 @@
+div.hidden-bar-overlay {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+
+  &.hidden-left {
+    left: 0;
+    align-items: flex-start;
+  }
+  &.hidden-right {
+    right: 0;
+    align-items: flex-end;
+  }
+}
+
+
+div.hidden-bar {
+  flex: 0 1 auto;
+  display: block;
+  button.btn > .caret {
+    margin-left: 4px;
+  }
+  li.dropdown-header {
+    font-weight: bold;
+  }
+  button {
+    display: none;
+  }
+  &.toggled button {
+    display: block;
+  }
+
+  button.toggler {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  // opener
+  &.hidden-right button.toggler:first-child {
+    display: block;
+  }
+  &.hidden-left button.toggler:last-child {
+    display: block;
+  }
+  // closer
+  &.hidden-left button.toggler:first-child {
+    display: none;
+  }
+  &.hidden-right button.toggler:last-child {
+    display: none;
+  }
+  &.hidden-left.toggled button.toggler:first-child {
+    display: block;
+  }
+  &.hidden-right.toggled button.toggler:last-child {
+    display: block;
+  }
+
+  &.hidden-right .dropdown-menu {
+    left: initial;
+    right: 0;
+  }
+
+  &.hidden-right .dropdown-submenu > .dropdown-menu {
+    left: initial;
+    right: 100%;
+  }
+
+  &.hidden-right .dropdown-submenu > a:before {
+    display: block;
+    content: " ";
+    float: left;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 5px 5px 5px;
+    border-right-color: #ccc;
+    margin-top: 5px;
+    margin-left: -15px;
+  }
+
+  &.hidden-right .dropdown-submenu:hover > a:before {
+    border-right-color: #333;
+  }
+
+  &.hidden-left .dropdown-submenu > a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+  }
+
+  &.hidden-left .dropdown-submenu:hover > a:after {
+    border-left-color: #333;
+  }
+}
+
+
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-menu {
+  margin: 0px;
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+}
+
+.dropdown:hover > .dropdown-menu {
+    display: block;
+}

@@ -9,6 +9,7 @@ require.config({
     'bootstrap': 'bower_components/bootstrap/dist/js/bootstrap',
     'power-assert': 'bower_components/power-assert/build/power-assert',
 
+
     // sensei-grid
     'sensei-grid': 'bower_components/sensei-grid/dist/sensei-grid',
     'lodash': 'bower_components/lodash/lodash',
@@ -23,7 +24,7 @@ require.config({
     'domReady': 'bower_components/domReady/domReady',
     'text': 'bower_components/text/text',
     
-    'hiddenbar': 'js/hiddenbar',
+    //'hiddenbar': 'js/hiddenbar',
   },
   shim: {
     'underscore':{
@@ -62,18 +63,16 @@ require.config({
           return this;
       }
     },
-    'hiddenbar': {
-      deps: ['jquery', 'require-css!css/hiddenbar'],
-    },
     'require-css!css/hiddenbar': {
-      deps: ['bootstrap'],
+      deps: ['bootstrap', 'font-awesome'],
     },
     'require-css!css/basic': {
-      deps: ['bootstrap'],
+      deps: ['bootstrap', 'font-awesome'],
     },
   },
+  map: {
+    '*': {
+      'font-awesome': 'require-css!bower_components/font-awesome/css/font-awesome',
+    }
+  }
 });
-
-"\
-\
-"

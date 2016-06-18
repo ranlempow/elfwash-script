@@ -61,7 +61,7 @@ case 1:
       "  lua_createmodule(G, name, slice(arguments, 1));\n" +
       "};\n" +
       "G.str['require'] = function (name) {\n" +
-      "  lua_require(G, name);\n" +
+      "  return [lua_require(G, name)];\n" +
       "};\n" +
       "G.str['package'].str['seeall'] = function (module) {\n" +
       "  if (!module.metatable) {\n" +

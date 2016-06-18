@@ -1,6 +1,8 @@
 
-define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes', 'jScrollPane', 'bootstrap', 'hiddenbar', 'require-css!css/basic'], 
-  function ($, _, Backbone, Lua, assert, KeyCodes) {
+define(['jquery', 'underscore', 'backbone', 'power-assert', 'keycodes', 'js/logging', 'bootstrap', 'require-css!css/basic'], 
+function ($, _, Backbone, assert, KeyCodes, logging) {
+  
+
   function syntaxHighlightJson(json, changed, importants, alias, spaces) {
     if (typeof json != 'string') {
        json = JSON.stringify(json, null, spaces);
@@ -36,90 +38,6 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
       return span_render(cls, match);
     });
   }
-  
-  function logging(level, tag, message, time) {
-    function padChar(string, length, char) {
-      char = char || '0';
-      string = string.toString();
-      var zeros = length - string.length
-      while (zeros > 0) {
-        string = char  + string;
-        zeros--;
-      }
-      return string;
-    }
-    function formatDate(date, datePart, timePart, millisecondsPart) {
-      var dateString = '';
-      if (datePart) dateString += date.getFullYear() + '-' + padChar(date.getMonth() + 1, 2) + '-' + padChar(date.getDate(), 2);
-      if (datePart && timePart) dateString += ' ';
-      if (timePart) dateString += padChar(date.getHours(), 2) + ":" + padChar(date.getMinutes(), 2) + ":" +padChar(date.getSeconds(), 2);
-      if (timePart && millisecondsPart) dateString += ":" + padChar(date.getMilliseconds(), 4);
-      return dateString;
-    }
-
-    if (level in logging.level) {
-      level = logging.level[level];
-    }
-    var level_string = Object.keys(logging.level).filter(function(key) {
-      return logging.level[key] == level;
-    })
-
-
-    if (!time) time = new Date(0);
-    if (message instanceof Error) {
-      message = message.message;
-    } else if(message instanceof Object) {
-      message = syntaxHighlightJson(message);
-    } else if(! (message instanceof String)) {
-      message = message.toString();
-    }
-    assert(logging.levels.indexOf(level) != -1);
-    logging.$view.append(
-      $('<span class="'+ level_string +' record">').append(
-        $('<span class="timestamp">').text('[' + formatDate(new Date(), false, true, true) + ']'),
-        $('<span class="time">').text('[' + formatDate(time, true, true, false) + ']'),
-        $('<span class="level">').text('[' + padChar(level_string, 5, ' ') + ']'),
-        $('<span class="tag">').text(tag + ':'),
-        $('<span class="message">').html(message)
-      )
-    );
-  }
-
-  logging.level = {};
-  logging.level.trace = 0;
-  logging.level.debug = 10;
-  logging.level.info = 30;
-  logging.level.warn = 40;
-  logging.level.error = 50;
-  logging.level.fatal = 60;
-  logging.levels = [];
-  for (var k in logging.level) {
-    logging[k.toUpperCase()] = logging.level[k];
-    logging[k] = (function(level) {
-      return function(tag, message, time) {
-        logging(level, tag, message, time);
-      }
-    })(logging.level[k]);
-    logging[k].level = logging.level[k];
-    logging[k].getLogger = (function(level) {
-      return function(tag) {
-        return function(message, time) {
-          logging(level, tag, message, time);
-        }
-      }
-    })(logging.level[k]);
-    logging.levels.push(logging.level[k]);
-  }
-  logging.getLogger = function(tag) {
-    return function(level, message, time) {
-      logging(level, tag, message, time);
-    }
-  }
-  logging.$view = $('#event-logging pre')
-  
-
-
-
 
   function walksequence(next, idx, length) {
     if (next) {
@@ -142,20 +60,36 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
     return idx;
   }
 
+  var Collection = Backbone.Collection.extend({
+    add: function(models) {
+      Backbone.Collection.prototype.add.apply(this, [models, {merge: true}]);
+    },
+  })
 
   var GroupView = Backbone.View.extend({
-    default_el: '<div class="obj-container" tabindex="0">',
+    default_el: '<div class="group" tabindex="0">',
+    cmds: {},
     initialize: function () {
       this.setElement($(this.default_el));
+      this.viewLabel || (this.viewLabel = this.name);
 
       this.id = GroupView.instances.length;
       GroupView.instances.push(this);
-      _.bindAll(this, 'render', 'addItem', 'removeItem', 'changedItem', 'clickCommand', 'focusContainer', 'keyContainer',
-                      'selectNext', 'toggleMember', 'selectMember', 'previewMember', 'deselectAll');
-      //_.bindAll.apply(null, $.merge([this], Object.keys(this.cmds)));
+      _.bindAll(this, 'addItem', 'removeItem', 'changedItem',
+                      'clickCommand', 'focusContainer', 'keyContainer',
+                      'toggleMember', 'selectMember', 'previewMember', 'deselectAll');
 
+      var prototype = Object.getPrototypeOf(this);
+      for (var cmd_name in this.cmds) {
+        var cmd = this.cmds[cmd_name];
+        if (cmd.execute) {
+          if (prototype[cmd_name] === undefined) {
+            prototype[cmd_name] = cmd.execute;
+          }
+        }
+      }
 
-      this.co = new (Backbone.Collection.extend({model: this.modelClass}))(); //({ view: this });
+      this.co = new (Collection.extend({model: this.modelClass}))();
       this.co.bind('add', this.addItem);
       this.co.bind('remove', this.removeItem);
       this.co.bind('changed', this.changedItem);
@@ -171,8 +105,22 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
       //"click body": "deselectAll",
       "mouseover .member": "previewMember",
     },
+    hide: function() {
+      this.$el.css('display', 'none');
+    },
+    show: function() {
+      this.$el.css('display', '');
+    },
+    removeThis: function() {
+      // TODO:
+      GroupView.tabdown(true);
+    },
+    getView: function(name) {
+      // TODO:
+    },
     render: function() {
-      this.$el.append($('<div class="title">').html(this.name));
+      this.$el.html();
+      this.$el.append($('<div class="title">').html(this.viewLabel));
       var $button_group = $('<div class="button-group">');
       this.$el.append($button_group);
       for (command in this.cmds) {
@@ -182,6 +130,9 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
         $button_group.append(btn);
       }
       this.$el.append("<ul>");
+      this.co.each( function(model) {
+        this.addItem(model, this.co);
+      });
       this.deselectAll();
     },
     focusContainer: function(ev) {
@@ -192,7 +143,7 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
       var elements = $('.member', this.el).toArray();
       if (this.select_id !== null) {
         idx = $('.member', this.el).map(function() {
-          return $(this).attr('cid');
+          return $(this).attr('id');
         }).get().indexOf(this.select_id);
       }
       idx = walksequence(next, idx, elements.length);
@@ -239,10 +190,37 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
         this.deselectAll()
         $(ev.target).addClass('select')
         $(ev.target).addClass('last-select')
-        this.select_id = $(ev.target).attr('cid');
+        this.select_id = $(ev.target).attr('id');
       }
       if (this.select_id !== null) {
         this.previewMember(ev, '#json-last-select');
+      }
+    },
+    _renderJsonViewer: function(model, target_viewer) {
+      if (model !== null) {
+        $(target_viewer).attr('group_id', this.id).attr('member_id', model.id);
+        $(target_viewer + ' pre').html(syntaxHighlightJson(model.toJSON(), model.changed, model.importants, model.alias, 2))
+        $(target_viewer + ' .title').html(this.name + ' -> ' + model.getTitle());
+      } else {
+        $(target_viewer).removeAttr('group_id').removeAttr('member_id');
+        $(target_viewer + ' pre').html('');
+        $(target_viewer + ' .title').html('');
+      }
+    },
+    _updateJsonViewer: function(model, options) {
+      var deletion = options.deletion || false;
+      for (var i in GroupView.json_viewer_ids) {
+        var target_view = '#' + GroupView.json_viewer_ids[i];
+        var $json_viewer = $(target_view);
+        var group_id = $json_viewer.attr('group_id');
+        var member_id = $json_viewer.attr('member_id');
+        if (group_id == this.id && member_id == model.id) {
+          if (deletion) {
+            this._renderJsonViewer(null, target_view);
+          } else {
+            this._renderJsonViewer(model, target_view);
+          }
+        }
       }
     },
     previewMember: function(ev, target_view) {
@@ -251,12 +229,10 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
       if (! $target.hasClass('member')) {
         $target = $target.parents('.member').last()
       }
-      var target_id = $target.attr('cid');
+      var target_id = $target.attr('id');
       assert(target_id !== undefined);
       var model = this.co.get(target_id);
-      $(target_view).attr('group_id', this.id).attr('member_id', target_id);
-      $(target_view + ' pre').html(syntaxHighlightJson(model.toJSON(), model.changed, model.importants, model.alias, 2))
-      $(target_view + ' .title').html(this.name + ' -> ' + model.getTitle());
+      this._renderJsonViewer(model, target_view);
     },
     deselectAll: function() {
       $('ul li', this.el).removeClass('select');
@@ -274,24 +250,92 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
       } else {
         $icon = $('<img>').attr('src', icon);
       }
-      $item.html('').append($icon).append(title)
+      $item.html('').append($icon).append($('<span class="title">').text(title));
     },
     addItem: function (model, collection, options) {
-      var $item = $('<li class="member">').attr('cid', model.cid);
+      var $item = $('<li class="member">').attr('id', model.id);
       this._renderMember($item, model);
       $('ul', this.el).append($item);
     },
     removeItem: function(model, collection, options) {
-      var $item = $('ul li[cid='+ model.cid +']', this.el);
+      var $item = $('ul li[id='+ model.id +']', this.el);
       $item.remove();
-      // TODO: 更新左側數據
-
+      // 更新左側數據
+      this._updateJsonViewer(model, {deletion:true})
     },
     changedItem: function(model, options) {
-      var $item = $('ul li[cid='+ model.cid +']', this.el);
+      var $item = $('ul li[id='+ model.id +']', this.el);
       this._renderMember($item, model);
-      // TODO: 更新左側數據
+      // 更新左側數據
+      this._updateJsonViewer(model);
+    },
+    callCommand: function (command) {
+      // execute command
+      var error = null;
+      try {
+        if(!(command in this.cmds)) throw new Error('command "' + command + '" not in cmds');
+        if(!(this[command] instanceof Function)) throw new Error('command "' + command + '" function is undefined');
 
+        var requirement = this.cmds[command];
+        var require_targets = requirement.targets || '?';
+        var require_prompt = requirement.prompt || false;
+        var select_id = this.select_id;
+        var value = null;
+        var other_target = null;
+        if (require_prompt) {
+          value = prompt(requirement.label + ' <- ' + requirement.prompt);
+        }
+
+        if (Array.isArray(require_targets)) {
+          var contain_null = false;
+          other_target = []
+          for (var j in require_targets) {
+            other_target[j] = null;
+            for (var i in GroupView.instances) {
+              var view = GroupView.instances[i];
+              if (requirement.targets[j] == view.name) {
+                other_target[j] = view.select_id;
+              }
+            }
+            if (other_target[j] === null) {
+              contain_null = requirement.targets[j];
+              break;
+            }
+          }
+          if (contain_null) {
+            throw new Error('group "' + contain_null + '" need selection');
+          }
+        } else {
+          switch(require_targets) {
+            case '0':
+              select_id = null;
+              break;
+            case '1':
+              if (this.select_id === null) {
+                throw new Error('group "' + this.name + '" need selection');
+              }
+              break;
+            case '?':
+              break;
+            case 'A':
+              other_target = {}
+              for (var i in GroupView.instances) {
+                var view = GroupView.instances[i];
+                other_target[view.name] = view.select_id;
+              }
+              break;
+            default:
+              // equelment to '?'
+              break;
+          }
+        }
+      } catch (e) {
+        error = e;
+        logging('error', 'command', e);
+      }
+      if (error === null) { 
+        this[command].apply(this, [this.select_id, other_target, value]);
+      }
     },
     pushCommand: function (who, is_pushdown) {
       /** when user push command alt-key
@@ -317,120 +361,79 @@ define(['jquery', 'underscore', 'backbone', 'js/luaw', 'power-assert', 'keycodes
       }
     },
     clickCommand: function (ev) {
-      // execute command
       var command = $(ev.target).attr('command');
-      assert(command in this.cmds);
-      assert(this[command] instanceof Function);
-      requirement = this.cmds[command]
-      var require_targets = requirement.targets || '?';
-      var require_prompt = requirement.prompt || false;
-      var prompt_value = null;
-      if (require_prompt) {
-        prompt_value = prompt(requirement.label + ' <- ' + requirement.prompt);
-      }
-      if (Array.isArray(require_targets)) {
-        var contain_null = false;
-        var other_target = []
-        for (var j in require_targets) {
-          other_target[j] = null;
-          for (var i in GroupView.instances) {
-            var view = GroupView.instances[i];
-            if (requirement.targets[j] == view.name) {
-              other_target[j] = view.select_id;
-            }
-          }
-          if (other_target[j] === null) {
-            contain_null = true;
-            break;
-          }
-        }
-        if (!contain_null) {
-          this[command].apply(this, [this.select_id, other_target, prompt_value]);
-        }
-      } else {
-        switch(require_targets) {
-          case '0':
-            this[command](null, null, prompt_value);
-            break;
-          case '1':
-            if (this.select_id !== null) {
-              this[command](this.select_id, null, prompt_value);
-            }
-            break;
-          case '?':
-            this[command](this.select_id, null, prompt_value);
-            break;
-          case 'A':
-            var other_target = {}
-            for (var i in GroupView.instances) {
-              var view = GroupView.instances[i];
-              other_target[view.name] = view.select_id;
-            }
-            this[command](this.select_id, other_target, prompt_value);
-            break;
-          default:
-            // equelment to '?'
-            this[command](this.select_id, null, prompt_value);
-            break;
-        }
-      }
+      this.callCommand(command);
+      this.$el[0].focus();
     }
+  }, 
+  // static
+  {
+    is_setup: false,
+    instances: [],
+    select_id: null,
+    json_viewer_ids: ['json-fixed', 'json-last-select', 'json-preview'],
+    Breaker: '<div class="breaker">',
+    tabdown: function(next) {
+      this.select_id = walksequence(next, this.select_id, this.instances.length);
+      for (var i in this.instances) {
+        var view = this.instances[i];
+        view.$el[0].blur();
+      }
+      if (this.select_id !== null) {
+        var view = this.instances[this.select_id];
+        view.$el[0].focus();
+      }
+    },
+    setup: function() {
+      if (! GroupView.is_setup ) {
+        $('body').keydown(function(ev) {
+          if (ev.which == KeyCodes.RIGHT) {
+            ev.preventDefault();
+            GroupView.tabdown(true);
+          }
+          if (ev.which == KeyCodes.LEFT) {
+            ev.preventDefault();
+            GroupView.tabdown(false);
+          }
+        });
+        GroupView.is_setup = true;
+      } 
+    },
   });
-  GroupView.is_setup = false;
-  GroupView.instances = [];
-  GroupView.select_id = null;
-  GroupView.tabdown = function(next) {
-    this.select_id = walksequence(next, this.select_id, this.instances.length);
-    for (var i in this.instances) {
-      var view = this.instances[i];
-      view.$el[0].blur();
-    }
-    if (this.select_id !== null) {
-      var view = this.instances[this.select_id];
-      view.$el[0].focus();
-    }
-  }
-  GroupView.setup = function() {
-    if (! GroupView.is_setup ) {
-      $('body').keydown(function(ev) {
-        if (ev.which == KeyCodes.RIGHT) {
-          ev.preventDefault();
-          GroupView.tabdown(true);
-        }
-        if (ev.which == KeyCodes.LEFT) {
-          ev.preventDefault();
-          GroupView.tabdown(false);
-        }
-      });
-      GroupView.is_setup = true;
-    } 
-  }
-  GroupView.Breaker = '<div class="breaker">';
 
   var Member = Backbone.Model.extend({
      initialize: function() {
-
-      if (!this.has('id')) {
-        var id = Member.createRandomId(this.type);
-        this.set('id', id);
+      if (!this.typeName) {
+        logging('error', 'member', 'member.typeName should be set, but member.typeName is null');
       }
-      if (!this.has('type')) {
-        // ...  
+      if (!this.has('id')) {
+        var id = Member.createRandomId(this.typeName);
+        this.set('id', id);
+        logging.warn('member', 'member[' + this.typeName + '] had no id, create random id "'+ id +'" automatically')
       }
     },
     importants: [],
     alias: {},
-    getTitle: function() { return this.get('name'); },
-    getIcon: function() { return 'asset/愛麗絲妖精.png'; },
+    getTitle: function() {
+      return this.get('label') || this.get('name') || this.id;
+    },
+    getIcon: function() { return 'glyphicon-knight'; },
+  }, {
+    createRandomId: function () {
+      return (Math.random() * 100000 | 0).toString();
+    }
   });
-  Member.createRandomId = function() {
-    return (Math.random() * 100000 | 0).toString();
-  }
+
+
+  $(function() {
+    logging.$el = $('#event-logging pre');
+  });
+  
 
   function init() {
     GroupView.setup();
     $('.dropdown-toggle').dropdown();
-    $('.hidden-bar').hiddenbar();
+    //$('.hidden-bar').hiddenbar();
     //$('.scroll-pane').jScrollPane();
     $('.scroll-pane').removeAttr('tabindex');
     $('#btn-enter').css('visibility', 'initial').click(function () {

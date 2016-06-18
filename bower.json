@@ -26,6 +26,7 @@
     "domReady": "^2.0.1",
     "text": "requirejs-text#^2.0.15",
     "jScrollPane": "jscrollpane#^2.0.23",
-    "power-assert": "^1.4.1"
+    "power-assert": "^1.4.1",
+    "font-awesome": "fontawesome#^4.6.3"
   }
 }
