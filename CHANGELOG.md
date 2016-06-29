@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [v0.8.1] - 2016-06-29
+- gruntfile: add CoffeeScript
 
 ## [v0.8.0] - 2016-06-18
 - docs: v0.8 api 完成, 剩下Lua, system還沒寫完, 預計再v0.8.1寫完

@@ -46,7 +46,7 @@ module.exports = function(grunt) {
           {expand: true, src: ['bower_components/*/dist/fonts/*', 'bower_components/*/fonts/*'], dest: 'dist/'},
           {expand: true, src: ['node_modules/keycode/index.js'], dest: 'dist/'},
           {expand: true, src: ['thirdparty/lua.js'], dest: 'dist/'},
-          {expand: true, cwd:"src/", src: ['js/**/*.js', 'lua/**/*.lua', 'css/**/*.css', '*.html', '!*.tpl.html'], dest: 'dist/'},
+          {expand: true, cwd:"src/", src: ['js/**/*.js', 'lua/**/*.lua', 'css/**/*.css', 'coffee/**/*.coffee', '*.html', '!*.tpl.html'], dest: 'dist/'},
         ],
       },
     },
@@ -114,6 +114,19 @@ module.exports = function(grunt) {
       }
     },
 
+    // coffee
+    coffee: {
+      glob_to_multiple: {
+        expand: true,
+        flatten: true,
+        cwd: 'src/',
+        src: ['coffee/**/*.coffee'],
+        dest: 'dist/js',
+        ext: '.js'
+      }
+    },
+
+
     // less
     less: {
       development: {
@@ -125,6 +138,7 @@ module.exports = function(grunt) {
         ]
       }
     }
+
   });
 
 
@@ -133,6 +147,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-ssh-deploy');
   grunt.loadNpmTasks('grunt-bump');
+  grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-espower');
   
@@ -257,7 +272,7 @@ module.exports = function(grunt) {
   });
 
 
-  grunt.registerTask('build', ['template', 'copy', 'less', 'luamodulize']);
+  grunt.registerTask('build', ['template', 'copy', 'coffee', 'less', 'luamodulize']);
 
   grunt.registerTask('deploy-github', ['build', 'upload-github']);
   grunt.registerTask('deploy-gamelab', ['build', 'ssh_deploy:production']);

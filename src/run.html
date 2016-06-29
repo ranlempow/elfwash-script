@@ -135,7 +135,7 @@
         console.log(entrypoints);
         require(['js/system', 'js/logging', 'js/runui', 'domReady!', 'font-awesome'].concat(entrypoints), function(system, logging, mv) {
             system.init(function() {
-                mv.init();
+                logging('info', 'mv.init', mv.init());
                 logging('info', 'system.init', 'ok');
             })
         });
